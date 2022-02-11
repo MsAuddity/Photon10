@@ -10,15 +10,48 @@ using Photon10.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//Register the application database with EntityFramework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    
+string connectionString;
+    //Heroku deployment is expected to identify self as Production environment
+    //If env var is not found, or not Production, assume development PC and load dev's database from local config
+    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+{
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        options.UseSqlServer(connectionString);
+}
+    //Production environment; so do some fancy magic to get our connection string
+    else
+{
+    var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            connUrl = connUrl.Replace("postgres://", string.Empty);
+            var pgUserPass = connUrl.Split("@")[0];
+            var pgHostPortDb = connUrl.Split("@")[1];
+            var pgHostPort = pgHostPortDb.Split("/")[0];
+            var pgDb = pgHostPortDb.Split("/")[1];
+            var pgUser = pgUserPass.Split(":")[0];
+            var pgPass = pgUserPass.Split(":")[1];
+            var pgHost = pgHostPort.Split(":")[0];
+            var pgPort = pgHostPort.Split(":")[1];
+            connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}";
+            options.UseNpgsql(connectionString);
+
+    }
+    
+});
+    
+    
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+//Don't need an identity provider. Left below lines in for posterity or something
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+//    .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+//TODO: remove all the weather stuff
 builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
