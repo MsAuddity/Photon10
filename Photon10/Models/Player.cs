@@ -27,21 +27,4 @@ namespace Photon10.Models
         [StringLength(30)]
         public string codename { get; set; }
     }
-    public class PlayerContext : DbContext
-    {
-        public PlayerContext()
-        {
-            
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        }
-        //entities
-        public DbSet<Player> Players { get; set; }
-    }
 }
