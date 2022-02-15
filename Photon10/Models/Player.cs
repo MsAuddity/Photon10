@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,6 +26,22 @@ namespace Photon10.Models
         [Column(TypeName = "char")]
         [StringLength(30)]
         public string codename { get; set; }
+    }
+    public class PlayerContext : DbContext
+    {
+        public PlayerContext()
+        {
+            
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        }
+        //entities
+        public DbSet<Player> Players { get; set; }
     }
 }
