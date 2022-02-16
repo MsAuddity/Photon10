@@ -1,0 +1,24 @@
+<u1>
+  @foreach(Models.Player player in PlayerList)
+  {
+    
+  }
+</u1>
+
+
+@inject IDbContextFactory<PlayerDbContext> DbFactory
+  
+//following code is how to do ops against the database. var context is used each time. line below is query to get back a list.  
+//  var context = DbFactory.CreateDbContext();
+//  Penalties = context.Penalties.Where<Penalty>(x => x.UserId == User.Id).ToList<Penalty>();
+  
+  List<Player> PlayerList {get; set;}
+  
+  protected override void OnInitialized()
+  {
+    var context = DbFactory.CreateDbContext();
+    
+    PlayerList = context.Players.ToList<Player>();
+  
+    base.OnIntialized();
+  }
