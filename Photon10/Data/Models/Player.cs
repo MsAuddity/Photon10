@@ -10,21 +10,21 @@ namespace Photon10.Models
     public class Player
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [Column(TypeName = "char")]
         [StringLength(30)]
-        public string first_name { get; set; }
+        public string FirstName { get; set; }
 
         [Required]
         [Column(TypeName = "char")]
         [StringLength(30)]
-        public string last_name { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         [Column(TypeName = "char")]
         [StringLength(30)]
-        public string codename { get; set; }
+        public string Codename { get; set; }
     }
 }
