@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Photon10.Areas.Identity;
 using Photon10.Data;
+using Photon10.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //Register the application database with EntityFramework
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<PlayerDbContext>(options =>
 {
     
 string connectionString;
