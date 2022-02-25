@@ -59,22 +59,21 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    //Use default port assignments for local development
+    app.Urls.Clear();
+    app.Urls.Add("http://*" + 80);
+    app.Urls.Add("https://*" + 443);
+    
     app.UseMigrationsEndPoint();
 }
 else
 {
-    string? port = Environment.GetEnvironmentVariable("PORT");
-    if (!string.IsNullOrWhiteSpace(port))
-    {
-        app.Urls.Add("http://*" + port);
-    }
-    
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
