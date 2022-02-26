@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //Register the application database with EntityFramework
-builder.Services.AddDbContext<PlayerDbContext>(options =>
+builder.Services.AddDbContextFactory<PlayerDbContext>(options =>
 {
     
 string connectionString;

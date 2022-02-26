@@ -1,26 +1,36 @@
-'@page "/list'
 
 <u1>
-  @foreach(Models.Player player in PlayerList)
-  {
-    
-  }
+    @if (Players.Count > 0)
+    {
+        @foreach (Models.Player player in Players)
+        {
+
+        }
+    }
+    else
+    {
+        <li>No players yet!</li>
+    }
+
+    <li>
+        <p>Player Entry Component goes here</p>
+    </li>
 </u1>
 
 
 @inject IDbContextFactory<PlayerDbContext> DbFactory
-  
-//following code is how to do ops against the database. var context is used each time. line below is query to get back a list.  
-//  var context = DbFactory.CreateDbContext();
-//  Penalties = context.Penalties.Where<Penalty>(x => x.UserId == User.Id).ToList<Penalty>();
-  
-  List<Player> PlayerList {get; set;}
-  
-  protected override void OnInitialized()
-  {
-    var context = DbFactory.CreateDbContext();
-    
-    PlayerList = context.Players.ToList<Player>();
-  
-    base.OnIntialized();
-  }
+@code
+{
+    //following code is how to do ops against the database. var context is used each time. line below is query to get back a list.
+    //  var context = DbFactory.CreateDbContext();
+    //  Penalties = context.Penalties.Where<Penalty>(x => x.UserId == User.Id).ToList<Penalty>();
+
+    private List<Models.Player> Players { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        var context = DbFactory.CreateDbContext();
+        Players = context.Players.Where(x => x.Id >= 0).ToList<Models.Player>();
+        return base.OnInitializedAsync();
+    }
+ }
