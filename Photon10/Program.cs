@@ -36,7 +36,7 @@ string connectionString;
             var pgPass = pgUserPass.Split(":")[1];
             var pgHost = pgHostPort.Split(":")[0];
             var pgPort = pgHostPort.Split(":")[1];
-            connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}";
+            connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL=true; SslMode=Require;";
             options.UseNpgsql(connectionString);
 
     }
