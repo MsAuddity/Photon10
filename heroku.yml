@@ -1,0 +1,3 @@
+﻿build:
+  docker:
+    web: Photon10/Dockerfile
