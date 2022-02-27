@@ -1,10 +1,10 @@
 
 <u1>
-    @if (Players.Count > 0)
+    @if (false)
     {
         @foreach (Models.Player player in Players)
         {
-
+            <p>@player.Codename</p>
         }
     }
     else
@@ -13,7 +13,7 @@
     }
 
     <li>
-        <p>Player Entry Component goes here</p>
+        <PlayerEntry/>
     </li>
 </u1>
 
