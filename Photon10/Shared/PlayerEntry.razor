@@ -1,14 +1,14 @@
-﻿<div class="PlayerEntryForm form-group">
+﻿<div>
     @if(!createNewPlayer)
     {
-    <EditForm Model="Player" OnSubmit=@OnSubmitAsync>
+    <EditForm class="form-inline" Model="Player" OnSubmit=@OnSubmitAsync>
         <InputText class="form-control form-text" placeholder="Player's codename" @bind-Value="Codename"/>
         <button class="btn-success" type="submit" @onclick=OnSubmitAsync><span class="oi oi-check text-white"/></button>
     </EditForm>
     }
     else
     {
-        <EditForm Model="Player" OnSubmit=@OnSubmitAsync>
+        <EditForm class="form-inline" Model="Player" OnSubmit=@OnSubmitAsync>
             <InputText class="form-control form-text" placeholder="First Name" @bind-Value="Player.FirstName"/>
             <InputText class="form-control form-text" placeholder="Surname" @bind-Value="Player.LastName"/>
             <button class="btn-success" type="submit" @onclick=OnSubmitAsync><span class="oi oi-check text-white"/></button>
