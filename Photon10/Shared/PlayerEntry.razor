@@ -1,0 +1,69 @@
+﻿<h3>PlayerEntry</h3>
+<div class="PlayerEntryForm form-group">
+    @if(!createNewPlayer)
+    {
+    <EditForm Model="Player" OnSubmit=@OnSubmitAsync>
+        <InputText class="form-control form-text" placeholder="Player's codename" @bind-Value="Codename"/>
+        <button class="btn-success" type="submit" @onclick=OnSubmitAsync><span class="oi oi-check text-white"/></button>
+    </EditForm>
+    }
+    else
+    {
+        <EditForm Model="Player" OnSubmit=@OnSubmitAsync>
+            <InputText class="form-control form-text" placeholder="First Name" @bind-Value="Player.FirstName"/>
+            <InputText class="form-control form-text" placeholder="Surname" @bind-Value="Player.LastName"/>
+            <button class="btn-success" type="submit" @onclick=OnSubmitAsync><span class="oi oi-check text-white"/></button>
+        </EditForm>
+    }
+</div>
+
+@inject IDbContextFactory<PlayerDbContext> DbFactory
+@code {
+    private bool createNewPlayer;
+
+    private string Codename { get; set; }
+    private Models.Player Player { get; set; }
+
+    [Parameter]
+    public EventCallback<Models.Player> ValueChanged { get; set; }
+    [Parameter]
+    public Models.Player Value { get; set; }
+
+    private async Task OnSubmitAsync()
+    {
+        if(!createNewPlayer)
+        {
+            var context = await DbFactory.CreateDbContextAsync();
+            Player = await context.Players.FirstOrDefaultAsync(x => x.Codename == Codename);
+            if(Player == null || Player == new Models.Player())
+            {
+                Player = new Models.Player();
+                Player.Codename = Codename;
+                createNewPlayer = true;
+                StateHasChanged();
+            }
+            else
+            {
+                Value = Player;
+                await ValueChanged.InvokeAsync(Player);
+            }
+        }
+        else
+        {
+
+            createNewPlayer = false;
+            var context = await DbFactory.CreateDbContextAsync();
+            await context.AddAsync(Player);
+            await context.SaveChangesAsync();
+            //TODO: Should check that operation was successful
+            Value = Player;
+            await ValueChanged.InvokeAsync(Player);
+        }
+    }
+    protected override void OnInitialized()
+    {
+        Player = new();
+        createNewPlayer = false;
+        base.OnInitialized();
+    }
+}
