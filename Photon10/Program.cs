@@ -60,6 +60,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    //Use default port assignments for local development
+    app.Urls.Clear();
+    app.Urls.Add("http://*" + 80);
+    app.Urls.Add("https://*" + 443);
+    
     app.UseMigrationsEndPoint();
 }
 else
@@ -69,7 +74,7 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
