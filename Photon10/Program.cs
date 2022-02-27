@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //Register the application database with EntityFramework
-builder.Services.AddDbContext<PlayerDbContext>(options =>
+builder.Services.AddDbContextFactory<PlayerDbContext>(options =>
 {
     
 string connectionString;
@@ -61,9 +61,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     //Use default port assignments for local development
-    app.Urls.Clear();
-    app.Urls.Add("http://*" + 80);
-    app.Urls.Add("https://*" + 443);
+    //app.Urls.Clear();
+    //app.Urls.Add("http://*" + 80);
+    //app.Urls.Add("https://*" + 443);
     
     app.UseMigrationsEndPoint();
 }
