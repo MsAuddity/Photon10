@@ -1,5 +1,4 @@
-﻿<h3>PlayerEntry</h3>
-<div class="PlayerEntryForm form-group">
+﻿<div class="PlayerEntryForm form-group">
     @if(!createNewPlayer)
     {
     <EditForm Model="Player" OnSubmit=@OnSubmitAsync>
@@ -20,6 +19,7 @@
 @inject IDbContextFactory<PlayerDbContext> DbFactory
 @code {
     private bool createNewPlayer;
+    private bool handlingSubmission;
 
     private string Codename { get; set; }
     private Models.Player Player { get; set; }
@@ -31,6 +31,14 @@
 
     private async Task OnSubmitAsync()
     {
+        if(handlingSubmission)
+        {
+            return;
+        }
+        else
+        {
+            handlingSubmission = true;
+        }
         if(!createNewPlayer)
         {
             var context = await DbFactory.CreateDbContextAsync();
@@ -59,6 +67,7 @@
             Value = Player;
             await ValueChanged.InvokeAsync(Player);
         }
+        handlingSubmission = false;
     }
     protected override void OnInitialized()
     {
