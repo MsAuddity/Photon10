@@ -26,25 +26,14 @@ string connectionString;
     //Production environment; so do some fancy magic to get our connection string
     else
 {
-    var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
         var databaseUri = new Uri(connUrl);
         var userInfo = databaseUri.UserInfo.Split(':');
 
-        connectionString = $"Server=" + databaseUri.Host + "; Port=" + databaseUri.Port + "; User=" + userInfo[0]
-                        + "; Pass=" + userInfo[1] + "; Database=" + databaseUri.LocalPath.TrimStart('/')
-                        + "; SSL=true; SslMode=Require; TrustServerCertificate=true;";
+        connectionString = $"Host=" + databaseUri.Host + "; Port=" + databaseUri.Port + "; Username=" + userInfo[0]
+                        + "; Password=" + userInfo[1] + "; Database=" + databaseUri.LocalPath.TrimStart('/')
+                        + "; SslMode=Require; TrustServerCertificate=true;";
         options.UseNpgsql(connectionString);
-
-        /*var pgUserPass = connUrl.Split("@")[0];
-            var pgHostPortDb = connUrl.Split("@")[1];
-            var pgHostPort = pgHostPortDb.Split("/")[0];
-            var pgDb = pgHostPortDb.Split("/")[1];
-            var pgUser = pgUserPass.Split(":")[0];
-            var pgPass = pgUserPass.Split(":")[1];
-            var pgHost = pgHostPort.Split(":")[0];
-            var pgPort = pgHostPort.Split(":")[1];
-            connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL=true; SslMode=Require; TrustServerCertificate=true;";
-            options.UseNpgsql(connectionString);*/
 
     }
     
