@@ -13,6 +13,10 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
+  <PropertyGroup>
+    <RootNamespace>Photon10</RootNamespace>
+  </PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="bunit" Version="1.6.4" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
