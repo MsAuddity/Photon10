@@ -1,0 +1,29 @@
+﻿@inherits TestContext
+@code {
+    [Fact]
+    public void GameSplashScreenDisplays()
+    {
+        //Act
+        ComponentFactories.AddStub<Shared.PlayerList>();
+        var cut = Render(@<Index/>
+    );
+        var img = cut.Find(".splash img");
+
+        //Assert
+        Assert.False(img.HasAttribute("display:none"));
+    }
+
+    [Fact]
+    public void GameSplashGoesAway()
+    {
+        //Act
+        ComponentFactories.AddStub<Shared.PlayerList>();
+        var cut = Render(@<Index/>);
+        var img = cut.Find(".splash img");
+        var invocation = JSInterop.SetupVoid("hideSplash");
+        invocation.SetVoidResult();
+
+        //Assert
+        Assert.False(img.HasAttribute("display:none"));
+    }
+}
