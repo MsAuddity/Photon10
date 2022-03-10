@@ -56,8 +56,10 @@
     private int rowCount;
 
     //TODO: Create Single collection for life of game containing player & data for team, score, etc.
-    private List<Models.Player> Team1Players { get; set; }
-    private List<Models.Player> Team2Players { get; set; }
+    [Parameter]
+    public List<Models.Player> Team1Players { get; set; }
+    [Parameter]
+    public List<Models.Player> Team2Players { get; set; }
 
     private void OnPlayerAddToSession(Models.Player player, int team)
     {
@@ -80,7 +82,9 @@
     }
     protected override Task OnInitializedAsync()
     { //TODO: Check for existing game for circuit and restore if still live
+        if(Team1Players == null)
         Team1Players = new();
+        if(Team2Players == null)
         Team2Players = new();
         rowCount = 0;
         return base.OnInitializedAsync();
