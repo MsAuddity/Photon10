@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavManager
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime;
-@page "/playscreen"
+@page "/"
 
 
 <PageTitle>Index</PageTitle>
@@ -9,7 +9,7 @@
 <div class="splash">
     <img src=images/logo.jpg alt="logo" style="width:100%;height:100%;" />
 </div>
-<PlayerList/>
+<PlayerList AllowAddingPlayers="true" />
 
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
