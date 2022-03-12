@@ -4,10 +4,11 @@
     private int time = 0;
     private DateTime start = DateTime.Now;
     public bool timerEnd = false;
+    private int timerLen = 30;
 
     private void warning()
     {
-        time = (int)(30 - (DateTime.Now - start).TotalSeconds);
+        time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
         if (time >= 0) {
             StateHasChanged();
         } else
