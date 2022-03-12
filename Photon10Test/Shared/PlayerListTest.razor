@@ -1,0 +1,29 @@
+﻿@inherits TestContext
+@code {
+    [Fact]
+    public void ListTableRenders()
+    {
+        //Arrange
+        Services.AddDbContextFactory<Data.PlayerDbContext>();
+        ComponentFactories.AddStub<PlayerEntry>();
+
+        List<Models.Player> teamPlayers = new();
+        teamPlayers.Add(new Models.Player
+            {
+                Id = 12,
+                FirstName = "Jane",
+                LastName = "Doe",
+                Codename = "epicGamer"
+            });
+
+        var cut = Render(
+    @<PlayerList Team1Players= "teamPlayers" />
+    );
+
+
+        //Act
+        var entry = cut.Find("tbody p");
+        //Assert
+        Assert.True(entry.TextContent == teamPlayers[0].Codename);
+    }
+}
