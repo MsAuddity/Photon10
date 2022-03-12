@@ -24,7 +24,7 @@
                             {
                                 <p>@Team1Players[i].Codename</p>
                             }
-                            else if(i == Team1Players.Count())
+                            else if(i == Team1Players.Count() && AllowAddingPlayers)
                             {
                                 <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,1))/>
                             }
@@ -34,7 +34,7 @@
                             {
                                 <p>@Team2Players[i].Codename</p>
                             }
-                            else if(i == Team2Players.Count())
+                            else if(i == Team2Players.Count() && AllowAddingPlayers)
                             {
                                 <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,2))/>
                             }
@@ -56,8 +56,12 @@
     private int rowCount;
 
     //TODO: Create Single collection for life of game containing player & data for team, score, etc.
-    private List<Models.Player> Team1Players { get; set; }
-    private List<Models.Player> Team2Players { get; set; }
+    [Parameter]
+    public List<Models.Player> Team1Players { get; set; } = new();
+    [Parameter]
+    public List<Models.Player> Team2Players { get; set; } = new();
+    [Parameter]
+    public bool AllowAddingPlayers { get; set; } = false;
 
     private void OnPlayerAddToSession(Models.Player player, int team)
     {
@@ -80,8 +84,6 @@
     }
     protected override Task OnInitializedAsync()
     { //TODO: Check for existing game for circuit and restore if still live
-        Team1Players = new();
-        Team2Players = new();
         rowCount = 0;
         return base.OnInitializedAsync();
     }
