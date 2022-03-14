@@ -1,26 +1,55 @@
 ﻿@page "/play"
+@*Todo: Add database input from entry screen, fix layout of screen,change eventbox to make it fixed size*@
 
 <body>
-    <section class="bg-black" id="player_list">
+    <section id="player_list" class="bg-black" >
         <div class="container-fluid">
             <div class="row">
                 <div class="col-6 my-4">
                     <h2 class= "red_team text-center">alpha red</h2>
                     <div class="dashed_boarder red_team p-5">
-                        <p>Player1</p>
-                        <p>Player2</p>
-                        <p>Player3</p>
-                        <p>Player4</p>
-                        <p>Player5</p>
+@*                    <table style="width:100%">
+                       <thead>
+                        <tr>
+                            <th>Players</th>
+                            <th>Score</th>
+                        </tr>
+                       </thead>
+                       <tbody>
+                           <tr>
+                           @foreach(var Player in Team1Players){
+                                <td>@Player.Codename</td>
+                                <td>0</td>
+                           }  
+                           </tr>
+                           <tr>
+                               <td>Total Score</td>
+                               <td>100</td>
+                           </tr>
+                       </tbody>
+                    </table>*@
+                    <PlayerList Team1Players="Team1Players"/>
                     </div>
                 </div>
                 <div class="col-6 my-4">
                     <h2 class= "grn_team text-center">alpha grn</h2>
                     <div class="dashed_boarder grn_team p-5" >
-                        <p>Player1</p>
-                        <p>Player2</p>
-                        <p>Player3</p>
-                        <p>Player4</p>
+                    <table style="width:100%">
+                       <thead>
+                        <tr>
+                            <th>Players</th>
+                            <th>Score</th>
+                        </tr>
+                       </thead>
+                       <tbody>
+                           <tr>
+@*                           @foreach(var Player in Team2Players){
+                                <td>@Player.Codename</td>
+                                <td>0</td>
+                           }  *@
+                           </tr>      
+                       </tbody>
+                    </table>
                     </div>
                 </div>
             </div>
@@ -46,5 +75,8 @@
     </section>
 </body>
 @code {
-
+    [Parameter]
+    public List<Models.Player> Team1Players { get; set; } = new();
+    [Parameter]
+    public List<Models.Player> Team2Players { get; set; } = new();
 }
