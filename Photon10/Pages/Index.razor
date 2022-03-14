@@ -4,18 +4,44 @@
 @page "/"
 
 
-<PageTitle>Index</PageTitle>
 
-<div class="splash">
+
+@if (!gameStarted)
+{
+    <PageTitle>Index</PageTitle>
+    <div class="splash">
     <img src=images/logo.jpg alt="logo" style="width:100%;height:100%;" />
 </div>
-<PlayerList/>
-
+    <PlayerList @ref="lobbyList" AllowAddingPlayers="true"/>
+        <button class="btn-success" @onclick="StartGame">Start</button>
+    
+}
+else
+{
+    <PageTitle>Game In Progress</PageTitle>
+    <PlayScreen Team1Players="Team1" Team2Players="Team2"/>
+}
 @code {
+    [Parameter]
+    public bool gameStarted { get; set; } = false;
+
+    private List<Models.Player> Team1 { get; set; } = new();
+    private List<Models.Player> Team2 { get; set; } = new();
+    private PlayerList lobbyList { get; set; }
+    private void StartGame()
+    {
+        Team1 = lobbyList.Team1Players;
+        Team2 = lobbyList.Team2Players;
+        gameStarted = true;
+        StateHasChanged();
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Task.Delay(3000);
-        await JsRuntime.InvokeVoidAsync("hideSplash");
+        if (firstRender)
+        {
+            await Task.Delay(3000);
+            await JsRuntime.InvokeVoidAsync("hideSplash");
+        }
     }
 }
 

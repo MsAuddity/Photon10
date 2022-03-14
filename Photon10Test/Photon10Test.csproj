@@ -39,6 +39,10 @@
 	  <ProjectReference Include="..\Photon10\Photon10.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Pages\" />
+	</ItemGroup>
+
 
 
 </Project>

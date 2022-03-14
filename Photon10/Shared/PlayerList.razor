@@ -1,48 +1,64 @@
-<div class="w-50">
+<div class="w-100">
 
     @{
-            rowCount = Team1Players.Count();
-            if(Team2Players.Count() > rowCount)
-            {
-                rowCount = Team2Players.Count();
-            }
-            rowCount++;
+        rowCount = Team1Players.Count();
+        if (Team2Players.Count() > rowCount)
+        {
+            rowCount = Team2Players.Count();
         }
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Team One</th>
-            <th scope="col">Team Two</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for(int i = 0; i < rowCount; i++)
-                {
-                    <tr>
-                        <td>
-                            @if(i < Team1Players.Count())
+        rowCount++;
+    }
+    <table class="table table-dark table-bordered w-100">
+        <thead>
+            <tr>
+                <th scope="col" class= "red_team text-center">alpha red</th>
+                <th scope="col" class= "grn_team text-center">alpha grn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < rowCount; i++)
+            {
+                <tr>
+                    <td class="red_team">
+                        @if (i < Team1Players.Count())
+                        {
+                            <p>@Team1Players[i].Codename</p>
+                        }
+                        else if (i == Team1Players.Count())
+                        {
+                            if (AllowAddingPlayers)
                             {
-                                <p>@Team1Players[i].Codename</p>
+
+                                <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,1)) />
                             }
-                            else if(i == Team1Players.Count())
+                            else
                             {
-                                <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,1))/>
+                                <p>No Players In Team</p>
                             }
-                        </td>
-                        <td>
-                            @if(i < Team2Players.Count())
+                        }
+                    </td>
+                    <td class="grn_team">
+                        @if (i < Team2Players.Count())
+                        {
+                            <p>@Team2Players[i].Codename</p>
+                        }
+                        else if (i == Team2Players.Count())
+                        {
+                            if (AllowAddingPlayers)
                             {
-                                <p>@Team2Players[i].Codename</p>
+
+                                <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,2)) />
                             }
-                            else if(i == Team2Players.Count())
+                            else
                             {
-                                <PlayerEntry ValueChanged=@(x => OnPlayerAddToSession(x,2))/>
+                                <p>No Players In Team</p>
                             }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-</table>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 @inject IDbContextFactory<PlayerDbContext> DbFactory
@@ -57,9 +73,17 @@
 
     //TODO: Create Single collection for life of game containing player & data for team, score, etc.
     [Parameter]
-    public List<Models.Player> Team1Players { get; set; }
+    public List<Models.Player> Team1Players { get; set; } = new();
     [Parameter]
-    public List<Models.Player> Team2Players { get; set; }
+    public List<Models.Player> Team2Players { get; set; } = new();
+    /*
+    [Parameter]
+    public EventCallback Team1PlayersChanged { get; set; }
+    [Parameter]
+    public EventCallback Team2PlayersChanged { get; set; }
+    */
+    [Parameter]
+    public bool AllowAddingPlayers { get; set; } = false;
 
     private void OnPlayerAddToSession(Models.Player player, int team)
     {
@@ -67,25 +91,23 @@
         //TODO: optimize
         //TODO: display feedback to client on failure
 
-        if(Team1Players.Where(x => x.Id == player.Id).Count() > 0 || Team2Players.Where(x => x.Id == player.Id).Count() > 0)
+        if (Team1Players.Where(x => x.Id == player.Id).Count() > 0 || Team2Players.Where(x => x.Id == player.Id).Count() > 0)
         {
             return;
         }
-        if(team == 1)
+        if (team == 1)
         {
             Team1Players.Add(player);
+            //Team1PlayersChanged.InvokeAsync();
         }
         else
         {
             Team2Players.Add(player);
+            //Team2PlayersChanged.InvokeAsync();
         }
     }
     protected override Task OnInitializedAsync()
     { //TODO: Check for existing game for circuit and restore if still live
-        if(Team1Players == null)
-        Team1Players = new();
-        if(Team2Players == null)
-        Team2Players = new();
         rowCount = 0;
         return base.OnInitializedAsync();
     }
