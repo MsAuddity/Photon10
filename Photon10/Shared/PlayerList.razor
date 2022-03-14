@@ -1,4 +1,4 @@
-<div class="w-50">
+<div class="w-100">
 
     @{
         rowCount = Team1Players.Count();
@@ -8,18 +8,18 @@
         }
         rowCount++;
     }
-    <table class="table">
+    <table class="table table-dark table-bordered w-100">
         <thead>
             <tr>
-                <th scope="col">Team One</th>
-                <th scope="col">Team Two</th>
+                <th scope="col" class= "red_team text-center">alpha red</th>
+                <th scope="col" class= "grn_team text-center">alpha grn</th>
             </tr>
         </thead>
         <tbody>
             @for (int i = 0; i < rowCount; i++)
             {
                 <tr>
-                    <td>
+                    <td class="red_team">
                         @if (i < Team1Players.Count())
                         {
                             <p>@Team1Players[i].Codename</p>
@@ -37,7 +37,7 @@
                             }
                         }
                     </td>
-                    <td>
+                    <td class="grn_team">
                         @if (i < Team2Players.Count())
                         {
                             <p>@Team2Players[i].Codename</p>
@@ -76,6 +76,12 @@
     public List<Models.Player> Team1Players { get; set; } = new();
     [Parameter]
     public List<Models.Player> Team2Players { get; set; } = new();
+    /*
+    [Parameter]
+    public EventCallback Team1PlayersChanged { get; set; }
+    [Parameter]
+    public EventCallback Team2PlayersChanged { get; set; }
+    */
     [Parameter]
     public bool AllowAddingPlayers { get; set; } = false;
 
@@ -92,10 +98,12 @@
         if (team == 1)
         {
             Team1Players.Add(player);
+            //Team1PlayersChanged.InvokeAsync();
         }
         else
         {
             Team2Players.Add(player);
+            //Team2PlayersChanged.InvokeAsync();
         }
     }
     protected override Task OnInitializedAsync()
