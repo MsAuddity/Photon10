@@ -1,0 +1,24 @@
+﻿<p>Game starting in @time seconds.</p>
+
+@code {
+    private int time = 0;
+    private DateTime start = DateTime.Now;
+    public bool timerEnd = false;
+    private int timerLen = 30;
+
+    private void warning()
+    {
+        time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
+        if (time >= 0) {
+            StateHasChanged();
+        } else
+        {
+            timerEnd = true;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        warning();
+    }
+}

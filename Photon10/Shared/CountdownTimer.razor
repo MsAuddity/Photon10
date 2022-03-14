@@ -1,0 +1,28 @@
+﻿<p>@minutes minutes and @seconds seconds left in the game.</p>
+
+@code {
+    private int time = 0;
+    private DateTime start = DateTime.Now;
+    public bool timerEnd = false;
+    private int minutes;
+    private int seconds;
+    private int timerLen = 360;
+
+    private void warning()
+    {
+        time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
+        if (time >= 0) {
+            minutes = (time - (time % 60)) / 60;
+            seconds = time % 60;
+            StateHasChanged();
+        } else
+        {
+            timerEnd = true;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        warning();
+    }
+}
