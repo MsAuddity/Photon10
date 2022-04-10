@@ -50,8 +50,9 @@
     private PlayerList GamePlayerList { get; set; }
     private GameHandler gameHandler = new();
     private bool gameRunning = false;
-    GameEventProcessed gameEventProcessed;
-
+    GameUpdated gameUpdateProcessed;
+    public Task gameLoop;
+    private bool gameEventsPending = false;
     private void OnStopGameClicked()
     {
         gameRunning = false;
@@ -60,40 +61,52 @@
     }
     private void StartGame()
     {
-        gameEventProcessed = new(OnEventProcessed);
-        gameHandler.EventProcessed += gameEventProcessed;
+        gameUpdateProcessed = new(OnGameUpdated);
+        gameRunning = true;
+        //gameHandler.UpdateProcessed += gameUpdateProcessed;
         gameHandler.StartListener();
-
     }
-    private void OnEventProcessed(GameAttackData e)
+    private async Task UpdateGame()
     {
-        var data = gameHandler.GetPlayerData(e.attackerId);
-        if(data.Team == 1)
-        {
-            var player = Team1PlayerData.First(p => p.Player == data.Player);
-            var index = Team1PlayerData.IndexOf(player);
-            Team1PlayerData[index] = data;
-        }
-        else
-        {
-            var player = Team2PlayerData.First(p => p.Player == data.Player);
-            var index = Team2PlayerData.IndexOf(player);
-            Team2PlayerData[index] = data;
-        }
-        GameEventLog.Add(gameHandler.GetAttackEventString(e));
+        await Task.Delay(500);
+        await gameHandler.UpdateAsync();
+        OnGameUpdated();
     }
-
+    private void OnGameUpdated()
+    {
+        while(!gameHandler._eventsSinceLastUpdate.IsEmpty)
+        {
+            if(gameHandler._eventsSinceLastUpdate.TryDequeue(out var e))
+            {
+                GameEventLog.Add(e);
+            }
+        }
+        for(int i = 0; i < Team1PlayerData.Count; i++)
+        {
+            var data = gameHandler.GetPlayerData(Team1PlayerData[i].Player.Id);
+            Team1PlayerData[i] = data;
+        }
+        for(int i = 0; i < Team2PlayerData.Count; i++)
+        {
+            var data = gameHandler.GetPlayerData(Team2PlayerData[i].Player.Id);
+            Team2PlayerData[i] = data;
+        }
+        StateHasChanged();
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        UpdateGame();
+        base.OnAfterRender(firstRender);
+    }
     protected override void OnInitialized()
     {
         gameRunning = true;
         foreach(var player in Team1PlayerData)
         {
-            //GamePlayerList.PlayerAddToSession(player, 1);
             gameHandler.AddTrackedPlayer(player.Player, 1);
         }
         foreach(var player in Team2PlayerData)
         {
-            //GamePlayerList.PlayerAddToSession(player.Player, 2);
             gameHandler.AddTrackedPlayer(player.Player, 2);
         }
         StartGame(); //TEMP

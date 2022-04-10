@@ -8,7 +8,7 @@ using Photon10.Network;
 
 namespace Photon10.Services
 {
-    public delegate void GameEventProcessed(GameAttackData attackData);
+    public delegate void GameUpdated();
     public struct PlayerGameData
     {
         public Models.Player Player { get; set; }
@@ -23,13 +23,26 @@ namespace Photon10.Services
 
         private Dictionary<int, PlayerGameData> _playerData = new();
         private ConcurrentQueue<Data.GameAttackData> _pendingAttacks = new();
-        public ConcurrentQueue<Data.GameAttackData> _eventHistory = new();
+
+        public ConcurrentQueue<string> _eventsSinceLastUpdate = new();
+        public int eventCount = 0;
+        public int eventsProcessed = 0;
 
         GamePacketReceived packetReceivedEvent;
-        public event GameEventProcessed EventProcessed;
+        public event GameUpdated UpdateProcessed;
         private string pythonExecutablePath = string.Empty;
 
-
+        private Task gameUpdater;
+        private bool shouldStopGame = false;
+        private async Task LoopUpdate()
+        {
+            while(!shouldStopGame)
+            {
+                await UpdateAsync();
+                await Task.Delay(500);
+            }
+            
+        }
         public void AddTrackedPlayer(Models.Player player, int team)
         {
             var playerData = new PlayerGameData
@@ -50,10 +63,16 @@ namespace Photon10.Services
 
             //Start listening for game traffic
             NetworkTrafficListener.Start();
+
+            //Start updates
+            //gameUpdater = Task.Run(() => LoopUpdate());
         }
         public void ProcessPacket(PacketReceivedEventArgs e)
         {
-
+            ProcessPacketAsync(e);
+        }
+        public async Task ProcessPacketAsync(PacketReceivedEventArgs e)
+        {
             string data = e.packetData;
             var targets = data.Normalize().Split(':');
             if (targets.Count() > 0)
@@ -63,22 +82,42 @@ namespace Photon10.Services
                     attackerId = int.Parse(targets[0]),
                     receiverId = int.Parse(targets[1])
                 };
-                //EnqueueAttack(action);
-                var attacker = _playerData[action.attackerId];
-                attacker.Score += scoreIncrement;
-                _playerData[action.attackerId] = attacker;
-                FireEventProcessed(action);
+                _pendingAttacks.Enqueue(action);
+                //FireEventProcessed(action);
+                eventsProcessed++;
             }
+        }
+        public void ProcessPending()
+        {
+            while(!_pendingAttacks.IsEmpty)
+            {
+                if(_pendingAttacks.TryDequeue(out var action))
+                {
+                    var attacker = _playerData[action.attackerId];
+                    attacker.Score += scoreIncrement;
+                    _playerData[action.attackerId] = attacker;
+                    _eventsSinceLastUpdate.Enqueue($"{attacker.Player.Codename} hit {_playerData[action.receiverId].Player.Codename}");
+                }
+            }
+        }
+        public async Task UpdateAsync()
+        {
+            ProcessPending();
+            //FireGameUpdated();
         }
         public PlayerGameData GetPlayerData(int playerId)
         {
-            PlayerGameData data;
-            _playerData.TryGetValue(playerId, out data);
+            _playerData.TryGetValue(playerId, out var data);
             return data;
         }
-        public void FireEventProcessed(GameAttackData attackData)
+        public int GetPlayerScore(int playerId)
         {
-            EventProcessed(attackData);
+            _playerData.TryGetValue(playerId,out var player);
+            return player.Score;
+        }
+        public void FireGameUpdated()
+        {
+            UpdateProcessed();
         }
 
         public string GetAttackEventString(GameAttackData attackEvent)
@@ -90,13 +129,13 @@ namespace Photon10.Services
         }
         public void StopGame()
         {
+            shouldStopGame = true;
             NetworkTrafficListener.EventReceived -= packetReceivedEvent;
             NetworkTrafficListener.Stop();
         }
         public void Dispose()
         {
             _playerData.Clear();
-            _eventHistory.Clear();
             NetworkTrafficListener.EventReceived -= packetReceivedEvent;
             NetworkTrafficListener.Stop();
 
