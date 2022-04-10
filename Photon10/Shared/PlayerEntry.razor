@@ -31,6 +31,7 @@
 
     private async Task OnSubmitAsync()
     {
+        Codename = Codename.Normalize().ToLower();
         if(handlingSubmission)
         {
             return;

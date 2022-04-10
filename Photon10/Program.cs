@@ -26,7 +26,8 @@ string connectionString;
     //Production environment; so do some fancy magic to get our connection string
     else
 {
-        var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        //var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        var connUrl = builder.Configuration.GetConnectionString("ProductionConnection");
         var databaseUri = new Uri(connUrl);
         var userInfo = databaseUri.UserInfo.Split(':');
 
