@@ -3,13 +3,16 @@
 
 <body class="bg-dark text-dark">
     <div id="gameTimerContainer" class="text-white">
+        <button class="btn-danger" @onclick="OnStopGameClicked">Stop Game</button>
+        @*TEMP*@
+        <button class="btn-warning" @onclick="StateHasChanged">Force Refresh</button> 
         <CountdownTimer/>
         <WarningTimer />
     </div>
     <section id="player_list" class="bg-black" >
         <div class="container-fluid">
             <div class="row">
-                <PlayerList Team1Players="Team1Players" Team2Players="Team2Players"/>
+                <PlayerList Team1Players="Team1PlayerData" Team2Players="Team2PlayerData" @ref="GamePlayerList"/>
                 
                 
             </div>
@@ -22,11 +25,10 @@
                 <div class="col-6 my-4">
                     <h2 class= "events text-center">events</h2>
                     <div class="dashed_boarder events p-5">
-                         <p>event1</p>
-                         <p>event2</p>
-                         <p>event3</p>
-                         <p>event4</p>
-                         <p>event5</p>
+                         @foreach(var e in GameEventLog)
+                        {
+                            <p>@e</p>
+                        }
                     </div>
                 </div>
                 <div class="col-3"></div>
@@ -39,4 +41,63 @@
     public List<Models.Player> Team1Players { get; set; } = new();
     [Parameter]
     public List<Models.Player> Team2Players { get; set; } = new();
+    [Parameter]
+    public List<string> GameEventLog { get; set; } = new();
+    [Parameter]
+    public List<PlayerGameData> Team1PlayerData { get; set; } = new();
+    [Parameter]
+    public List<PlayerGameData> Team2PlayerData { get; set; } = new();
+    private PlayerList GamePlayerList { get; set; }
+    private GameHandler gameHandler = new();
+    private bool gameRunning = false;
+    GameEventProcessed gameEventProcessed;
+
+    private void OnStopGameClicked()
+    {
+        gameRunning = false;
+        gameHandler.StopGame();
+        StateHasChanged();
+    }
+    private void StartGame()
+    {
+        gameEventProcessed = new(OnEventProcessed);
+        gameHandler.EventProcessed += gameEventProcessed;
+        gameHandler.StartListener();
+
+    }
+    private void OnEventProcessed(GameAttackData e)
+    {
+        var data = gameHandler.GetPlayerData(e.attackerId);
+        if(data.Team == 1)
+        {
+            var player = Team1PlayerData.First(p => p.Player == data.Player);
+            var index = Team1PlayerData.IndexOf(player);
+            Team1PlayerData[index] = data;
+        }
+        else
+        {
+            var player = Team2PlayerData.First(p => p.Player == data.Player);
+            var index = Team2PlayerData.IndexOf(player);
+            Team2PlayerData[index] = data;
+        }
+        GameEventLog.Add(gameHandler.GetAttackEventString(e));
+    }
+
+    protected override void OnInitialized()
+    {
+        gameRunning = true;
+        foreach(var player in Team1PlayerData)
+        {
+            //GamePlayerList.PlayerAddToSession(player, 1);
+            gameHandler.AddTrackedPlayer(player.Player, 1);
+        }
+        foreach(var player in Team2PlayerData)
+        {
+            //GamePlayerList.PlayerAddToSession(player.Player, 2);
+            gameHandler.AddTrackedPlayer(player.Player, 2);
+        }
+        StartGame(); //TEMP
+        base.OnInitialized();
+    }
+
 }

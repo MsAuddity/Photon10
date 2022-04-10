@@ -19,14 +19,14 @@
 else
 {
     <PageTitle>Game In Progress</PageTitle>
-    <PlayScreen Team1Players="Team1" Team2Players="Team2"/>
+    <PlayScreen Team1PlayerData="Team1" Team2PlayerData="Team2"/>
 }
 @code {
     [Parameter]
     public bool gameStarted { get; set; } = false;
 
-    private List<Models.Player> Team1 { get; set; } = new();
-    private List<Models.Player> Team2 { get; set; } = new();
+    private List<PlayerGameData> Team1 { get; set; } = new();
+    private List<PlayerGameData> Team2 { get; set; } = new();
     private PlayerList lobbyList { get; set; }
     private void StartGame()
     {
