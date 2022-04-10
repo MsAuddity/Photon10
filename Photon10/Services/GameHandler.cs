@@ -3,13 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Photon10.Data;
 using Photon10.Network;
-using System.Diagnostics;
-using IronPython.Hosting;
-using IronPython;
-using Microsoft.Scripting.Hosting;
 
 namespace Photon10.Services
 {
