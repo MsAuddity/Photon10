@@ -5,16 +5,45 @@
     private DateTime start = DateTime.Now;
     public bool timerEnd = false;
     private int timerLen = 30;
+    private DateTime timestop;
+    public bool enabled = false;
+    public bool first = true;
 
     private void warning()
     {
-        time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
-        if (time >= 0) {
-            StateHasChanged();
-        } else
+        if (enabled)
         {
-            timerEnd = true;
+            time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
+            if (time >= 0)
+            {
+                StateHasChanged();
+                StateHasChanged();
+            }
+            else
+            {
+                timerEnd = true;
+            }
         }
+    }
+
+        public void timeStart()
+    {
+        if (first)
+        {
+            start = DateTime.Now;
+            time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
+            timestop = DateTime.Now;    
+        }
+        start += (DateTime.Now - timestop);
+        enabled = true;
+        first = false;
+    }
+
+    public void timeStop()
+    {
+        time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
+        timestop = DateTime.Now;
+        enabled = false;
     }
 
     protected override void OnAfterRender(bool firstRender)
