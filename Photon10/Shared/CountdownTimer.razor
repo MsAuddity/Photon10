@@ -12,7 +12,7 @@
 
 @code {
     private int time = 0;
-    private DateTime start = DateTime.Now;
+    private DateTime start;
     public bool timerEnd = false;
     private int minutes;
     private int seconds;
@@ -40,13 +40,18 @@
     {
         time = timerLen;
         runTimer = TimerRun;
+        minutes = (time - (time % 60)) / 60;
+        seconds = time % 60;
         base.OnInitialized();
     }
     protected override void OnParametersSet()
     {
+        if(runTimer != TimerRun)
+        {
+            start = DateTime.Now;
+        }
         runTimer = TimerRun;
-        minutes = (time - (time % 60)) / 60;
-        seconds = time % 60;
+        
         base.OnParametersSet();
     }
     protected override void OnAfterRender(bool firstRender)
