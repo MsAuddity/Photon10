@@ -17,22 +17,43 @@
     private int minutes;
     private int seconds;
     private int timerLen = 360;
-
+    [Parameter]
+    public EventCallback TimerFinished { get; set; }
+    [Parameter]
+    public bool TimerRun { get; set; } = false;
+    private bool runTimer;
     private void warning()
     {
         time = (int)(timerLen - (DateTime.Now - start).TotalSeconds);
-        if (time >= 0) {
+        if (time >= 0 && TimerRun) {
             minutes = (time - (time % 60)) / 60;
             seconds = time % 60;
             StateHasChanged();
         } else
         {
             timerEnd = true;
+            TimerRun = false;
+            TimerFinished.InvokeAsync();
         }
     }
-
+    protected override void OnInitialized()
+    {
+        time = timerLen;
+        runTimer = TimerRun;
+        base.OnInitialized();
+    }
+    protected override void OnParametersSet()
+    {
+        runTimer = TimerRun;
+        minutes = (time - (time % 60)) / 60;
+        seconds = time % 60;
+        base.OnParametersSet();
+    }
     protected override void OnAfterRender(bool firstRender)
     {
-        warning();
+        if(runTimer)
+        {
+            warning();
+        }
     }
 }

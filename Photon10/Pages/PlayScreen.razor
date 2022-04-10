@@ -1,20 +1,14 @@
 ﻿
-@*Todo: Add database input from entry screen, fix layout of screen,change eventbox to make it fixed size*@
-
 <body class="bg-dark text-dark">
     <div id="gameTimerContainer" class="text-white">
-        <button class="btn-danger" @onclick="OnStopGameClicked">Stop Game</button>
-        @*TEMP*@
-        <button class="btn-warning" @onclick="StateHasChanged">Force Refresh</button> 
-        <CountdownTimer/>
-        <WarningTimer />
+        <button class="btn-danger" @onclick="OnStopGame">Stop Game</button>
+        <CountdownTimer TimerFinished="OnStopGame" TimerRun="gameRunning"/>
+        <WarningTimer TimerFinished="StartGame"/>
     </div>
     <section id="player_list" class="bg-black" >
         <div class="container-fluid">
             <div class="row">
-                <PlayerList Team1Players="Team1PlayerData" Team2Players="Team2PlayerData" @ref="GamePlayerList"/>
-                
-                
+                <PlayerList Team1Players="Team1PlayerData" Team2Players="Team2PlayerData"/>             
             </div>
         </div>
     </section>
@@ -47,13 +41,9 @@
     public List<PlayerGameData> Team1PlayerData { get; set; } = new();
     [Parameter]
     public List<PlayerGameData> Team2PlayerData { get; set; } = new();
-    private PlayerList GamePlayerList { get; set; }
     private GameHandler gameHandler = new();
     private bool gameRunning = false;
-    GameUpdated gameUpdateProcessed;
-    public Task gameLoop;
-    private bool gameEventsPending = false;
-    private void OnStopGameClicked()
+    private void OnStopGame()
     {
         gameRunning = false;
         gameHandler.StopGame();
@@ -61,9 +51,7 @@
     }
     private void StartGame()
     {
-        gameUpdateProcessed = new(OnGameUpdated);
         gameRunning = true;
-        //gameHandler.UpdateProcessed += gameUpdateProcessed;
         gameHandler.StartListener();
     }
     private async Task UpdateGame()
@@ -95,12 +83,15 @@
     }
     protected override void OnAfterRender(bool firstRender)
     {
-        UpdateGame();
+        if(gameRunning)
+        {
+            UpdateGame();
+        }
         base.OnAfterRender(firstRender);
     }
     protected override void OnInitialized()
     {
-        gameRunning = true;
+        gameRunning = false;
         foreach(var player in Team1PlayerData)
         {
             gameHandler.AddTrackedPlayer(player.Player, 1);
@@ -109,7 +100,6 @@
         {
             gameHandler.AddTrackedPlayer(player.Player, 2);
         }
-        StartGame(); //TEMP
         base.OnInitialized();
     }
 
