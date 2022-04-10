@@ -1,17 +1,14 @@
 ﻿
-@*Todo: Add database input from entry screen, fix layout of screen,change eventbox to make it fixed size*@
-
 <body class="bg-dark text-dark">
     <div id="gameTimerContainer" class="text-white">
-        <CountdownTimer/>
-        <WarningTimer />
+        <button class="btn-danger" @onclick="OnStopGame">Stop Game</button>
+        <CountdownTimer TimerFinished="OnStopGame" TimerRun="gameRunning"/>
+        <WarningTimer TimerFinished="StartGame"/>
     </div>
     <section id="player_list" class="bg-black" >
         <div class="container-fluid">
             <div class="row">
-                <PlayerList Team1Players="Team1Players" Team2Players="Team2Players"/>
-                
-                
+                <PlayerList Team1Players="Team1PlayerData" Team2Players="Team2PlayerData"/>             
             </div>
         </div>
     </section>
@@ -22,11 +19,10 @@
                 <div class="col-6 my-4">
                     <h2 class= "events text-center">events</h2>
                     <div class="dashed_boarder events p-5">
-                         <p>event1</p>
-                         <p>event2</p>
-                         <p>event3</p>
-                         <p>event4</p>
-                         <p>event5</p>
+                         @foreach(var e in GameEventLog)
+                        {
+                            <p>@e</p>
+                        }
                     </div>
                 </div>
                 <div class="col-3"></div>
@@ -39,4 +35,72 @@
     public List<Models.Player> Team1Players { get; set; } = new();
     [Parameter]
     public List<Models.Player> Team2Players { get; set; } = new();
+    [Parameter]
+    public List<string> GameEventLog { get; set; } = new();
+    [Parameter]
+    public List<PlayerGameData> Team1PlayerData { get; set; } = new();
+    [Parameter]
+    public List<PlayerGameData> Team2PlayerData { get; set; } = new();
+    private GameHandler gameHandler = new();
+    private bool gameRunning = false;
+    private void OnStopGame()
+    {
+        gameRunning = false;
+        gameHandler.StopGame();
+        StateHasChanged();
+    }
+    private void StartGame()
+    {
+        gameRunning = true;
+        gameHandler.StartListener();
+    }
+    private async Task UpdateGame()
+    {
+        await Task.Delay(500);
+        await gameHandler.UpdateAsync();
+        OnGameUpdated();
+    }
+    private void OnGameUpdated()
+    {
+        while(!gameHandler._eventsSinceLastUpdate.IsEmpty)
+        {
+            if(gameHandler._eventsSinceLastUpdate.TryDequeue(out var e))
+            {
+                GameEventLog.Add(e);
+            }
+        }
+        for(int i = 0; i < Team1PlayerData.Count; i++)
+        {
+            var data = gameHandler.GetPlayerData(Team1PlayerData[i].Player.Id);
+            Team1PlayerData[i] = data;
+        }
+        for(int i = 0; i < Team2PlayerData.Count; i++)
+        {
+            var data = gameHandler.GetPlayerData(Team2PlayerData[i].Player.Id);
+            Team2PlayerData[i] = data;
+        }
+        StateHasChanged();
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(gameRunning)
+        {
+            UpdateGame();
+        }
+        base.OnAfterRender(firstRender);
+    }
+    protected override void OnInitialized()
+    {
+        gameRunning = false;
+        foreach(var player in Team1PlayerData)
+        {
+            gameHandler.AddTrackedPlayer(player.Player, 1);
+        }
+        foreach(var player in Team2PlayerData)
+        {
+            gameHandler.AddTrackedPlayer(player.Player, 2);
+        }
+        base.OnInitialized();
+    }
+
 }

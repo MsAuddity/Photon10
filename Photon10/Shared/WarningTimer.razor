@@ -1,4 +1,6 @@
-<p>
+@if(timerEnd == false)
+{
+    <p>
 <H1><FONT COLOR="#66FF00">
 <div style="border-radius: 10px; 
 			background: black; 
@@ -9,12 +11,16 @@
 </div>
 </FONT></H1>
 </p>
+}
+
 
 @code {
     private int time = 0;
     private DateTime start = DateTime.Now;
     public bool timerEnd = false;
     private int timerLen = 30;
+    [Parameter]
+    public EventCallback TimerFinished { get; set; }
 
     private void warning()
     {
@@ -24,11 +30,20 @@
         } else
         {
             timerEnd = true;
+            TimerFinished.InvokeAsync();
         }
     }
-
+    protected override void OnInitialized()
+    {
+        time = timerLen;
+        base.OnInitialized();
+    }
     protected override void OnAfterRender(bool firstRender)
     {
-        warning();
+        if(!timerEnd)
+        {
+            warning();
+        }
+        
     }
 }
